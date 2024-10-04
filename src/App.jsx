@@ -1,11 +1,24 @@
-import React, { useState } from 'react';
-import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuidv4 } from 'uuid'; 
+import React, { useState, useEffect } from 'react';
 
 const App = () => {
   const [tasks, setTasks] = useState([]);
   const [title, setTitle] = useState('');
   const [desc, setDesc] = useState('');
   const [editingTask, setEditingTask] = useState(null);
+
+  // Load tasks from local storage when the component mounts
+  useEffect(() => {
+    const storedTasks = JSON.parse(localStorage.getItem('tasks'));
+    if (storedTasks) {
+      setTasks(storedTasks);
+    }
+  }, []);
+
+  // Save tasks to local storage whenever tasks are updated
+  useEffect(() => {
+    localStorage.setItem('tasks', JSON.stringify(tasks));
+  }, [tasks]);
 
   const capitalizeFirstLetter = (string) => {
     return string.charAt(0).toUpperCase() + string.slice(1);
@@ -52,14 +65,6 @@ const App = () => {
     e.preventDefault();
     if (title.trim() === '' || desc.trim() === '') {
       alert('Please fill in both the title and description.');
-      return; 
-    }
-    if(title.trim() === ''){
-      alert('Please fill  the title');
-      return; 
-    }
-    if(desc.trim() === ''){
-      alert('Please fill  the description.');
       return; 
     }
     if (editingTask) {
