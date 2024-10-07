@@ -13,14 +13,18 @@ const App = () => {
       <Create
         title={title}
         desc={desc}
-        editingTask={editingTask}
+        setDesc={setDesc}
         setTasks={setTasks}
+        editingTask={editingTask}
+        setEditingTask={setEditingTask}
         tasks={tasks}
         setTitle={setTitle}
-        setDesc={setDesc}
-      />
+        />
 
       <DisplayTask
+        title={title}
+        desc={desc}
+        setDesc={setDesc}
         setTasks={setTasks}
         editingTask={editingTask}
         setEditingTask={setEditingTask}

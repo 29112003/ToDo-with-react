@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 
 
-const DisplayTask = ({ tasks, setTasks, editingTask, setEditingTask }) => {
+const DisplayTask = ({ tasks, title , desc, setTasks, editingTask, setEditingTask }) => {
   const [filter, setFilter] = useState("all"); // Filter state
 
   useEffect(() => {
@@ -50,7 +50,6 @@ const DisplayTask = ({ tasks, setTasks, editingTask, setEditingTask }) => {
     setDesc(task.desc);
   };
 
-  const completedTasksCount = tasks.filter((task) => task.completed).length;
 
   // Filter tasks based on the selected filter
   const filteredTasks = tasks.filter((task) => {
@@ -128,7 +127,7 @@ const DisplayTask = ({ tasks, setTasks, editingTask, setEditingTask }) => {
                   </button>
                 </div>
                 <p className="text-gray-500 italic text-sm">
-                  {" "}
+                  {"  "}
                   {task.day} {task.time}
                 </p>
               </div>
