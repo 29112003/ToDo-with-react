@@ -1,12 +1,12 @@
 import { v4 as uuidv4 } from "uuid";
 import React, { useState, useEffect } from "react";
-import ProgressBar from "./components/ProgressBar";
 
 const App = () => {
   const [tasks, setTasks] = useState([]);
   const [title, setTitle] = useState("");
   const [desc, setDesc] = useState("");
   const [editingTask, setEditingTask] = useState(null);
+  const [filter, setFilter] = useState("all"); // Filter state
 
   useEffect(() => {
     const storedTasks = JSON.parse(localStorage.getItem("tasks"));
@@ -30,7 +30,7 @@ const App = () => {
           ...task,
           completed: !task.completed,
           time: new Date().toLocaleTimeString(),
-          day : new Date().toLocaleDateString('en-US', { weekday: 'long' })
+          day: new Date().toLocaleDateString('en-US', { weekday: 'long' }),
         };
       }
       return task;
@@ -44,8 +44,8 @@ const App = () => {
       title: capitalizeFirstLetter(title),
       desc: capitalizeFirstLetter(desc),
       completed: false,
-      time: new Date().toLocaleTimeString() ,
-      day : new Date().toLocaleDateString('en-US', { weekday: 'long' })
+      time: new Date().toLocaleTimeString(),
+      day: new Date().toLocaleDateString('en-US', { weekday: 'long' }),
     };
     setTasks([...tasks, newTask]);
     clearFields();
@@ -53,15 +53,14 @@ const App = () => {
 
   const handleDeleteTask = (id) => {
     const taskToDelete = tasks.find((task) => task.id === id);
-    
+
     // Confirm deletion only if the task is not completed
     if (!taskToDelete.completed || confirm("Are you sure you want to delete this task?")) {
-        setTasks(tasks.filter((task) => task.id !== id));
+      setTasks(tasks.filter((task) => task.id !== id));
     } else {
-        alert("You cannot delete a completed task.");
+      alert("You cannot delete a completed task.");
     }
-};
-
+  };
 
   const handleEditTask = (task) => {
     setEditingTask(task);
@@ -75,11 +74,9 @@ const App = () => {
       title: capitalizeFirstLetter(title),
       desc: capitalizeFirstLetter(desc),
       time: new Date().toLocaleTimeString(),
-      day : new Date().toLocaleDateString('en-US', { weekday: 'long' })
+      day: new Date().toLocaleDateString('en-US', { weekday: 'long' }),
     };
-    setTasks(
-      tasks.map((task) => (task.id === editingTask.id ? updatedTask : task))
-    );
+    setTasks(tasks.map((task) => (task.id === editingTask.id ? updatedTask : task)));
     clearFields();
     setEditingTask(null);
   };
@@ -101,12 +98,18 @@ const App = () => {
       handleAddTask();
     }
   };
+
   const completedTasksCount = tasks.filter(task => task.completed).length;
 
+  // Filter tasks based on the selected filter
+  const filteredTasks = tasks.filter(task => {
+    if (filter === 'completed') return task.completed;
+    if (filter === 'incomplete') return !task.completed;
+    return true; // For 'all', return all tasks
+  });
 
   return (
-    <div className="bg-yellow-100 w-screen h-screen pt-10 px-5 sm:px-10">
-      <ProgressBar completedTasks={completedTasksCount} totalTasks={tasks.length} />
+    <div className="bg-yellow-100 w-screen overflow-x-hidden h-screen pt-10 px-5 sm:px-10">
 
       <form onSubmit={submitHandler} className="max-w-lg mx-auto">
         <div className="flex flex-col gap-4 mb-6">
@@ -129,8 +132,21 @@ const App = () => {
         </div>
       </form>
 
+      {/* Filter Options */}
+      <div className="mb-4">
+        <select
+          value={filter}
+          onChange={e => setFilter(e.target.value)}
+          className="border p-2 rounded"
+        >
+          <option value="all">All Tasks</option>
+          <option value="completed">Completed Tasks</option>
+          <option value="incomplete">Incomplete Tasks</option>
+        </select>
+      </div>
+
       <div className="px-4 py-2 flex flex-wrap gap-4 justify-center">
-        {tasks.length <= 0 ? (
+        {filteredTasks.length <= 0 ? (
           <div className="flex flex-col items-center justify-center w-full h-48 bg-yellow-200 rounded-lg p-4 text-center shadow-md">
             <h2 className="font-bold text-xl mb-2">No Tasks Available</h2>
             <p className="text-gray-600 mb-4">
@@ -138,7 +154,7 @@ const App = () => {
             </p>
           </div>
         ) : (
-          tasks.map((task , index) => (
+          filteredTasks.map((task) => (
             <div
               key={task.id} // Use task.id as the unique key
               className={`transform transition-transform duration-300 hover:scale-105 w-full sm:w-[31%] p-6 rounded-lg shadow-xl flex flex-col items-start ${
